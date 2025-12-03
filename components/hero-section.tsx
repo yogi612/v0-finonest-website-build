@@ -4,29 +4,32 @@ import { useEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
 import { useParallax } from "./parallax-provider"
-import { ArrowRight, Shield, Clock, Percent, CheckCircle2 } from "lucide-react"
+import { ArrowRight, Shield, Clock, Percent, CheckCircle2, Home, Briefcase, CreditCard } from "lucide-react"
 
 const heroCards = [
   {
     title: "Personal Loans",
     subtitle: "Up to ₹25 Lakhs",
     rate: "10.5%",
-    icon: "💳",
-    color: "from-[#0064D6] to-[#002E9C]",
+    Icon: CreditCard,
+    gradient: "bg-gradient-to-br from-[#0064D6] to-[#002E9C]",
+    shadowColor: "shadow-[#0064D6]/30",
   },
   {
     title: "Home Loans",
     subtitle: "Dream Home Awaits",
     rate: "8.5%",
-    icon: "🏠",
-    color: "from-[#12D6E7] to-[#008B96]",
+    Icon: Home,
+    gradient: "bg-gradient-to-br from-[#12D6E7] to-[#008B96]",
+    shadowColor: "shadow-[#12D6E7]/30",
   },
   {
     title: "Business Loans",
     subtitle: "Grow Your Business",
     rate: "12%",
-    icon: "📈",
-    color: "from-[#008B96] to-[#002E9C]",
+    Icon: Briefcase,
+    gradient: "bg-gradient-to-br from-[#008B96] to-[#002E9C]",
+    shadowColor: "shadow-[#008B96]/30",
   },
 ]
 
@@ -37,8 +40,10 @@ const trustBadges = [
   { icon: CheckCircle2, text: "No Hidden Fees" },
 ]
 
+const smoothEasing = [0.16, 1, 0.3, 1]
+
 export function HeroSection() {
-  const { setIsHoveringCTA, scrollY } = useParallax()
+  const { setIsHoveringCTA } = useParallax()
   const sectionRef = useRef<HTMLDivElement>(null)
   const [activeCard, setActiveCard] = useState(0)
 
@@ -47,43 +52,48 @@ export function HeroSection() {
     offset: ["start start", "end start"],
   })
 
-  // Parallax transforms for hero cards
-  const cardsY = useTransform(scrollYProgress, [0, 1], [0, -200])
-  const cardsScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8])
+  const cardsY = useTransform(scrollYProgress, [0, 1], [0, -150])
+  const cardsScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.85])
   const cardsOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-
-  // Background parallax
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 100])
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 80])
 
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveCard((prev) => (prev + 1) % heroCards.length)
-    }, 3000)
+    }, 4000)
     return () => clearInterval(interval)
   }, [])
 
   return (
     <section ref={sectionRef} className="relative min-h-[100vh] overflow-hidden pt-20">
       {/* Animated background */}
-      <motion.div className="absolute inset-0 bg-gradient-to-b from-[#f4f7fa] via-white to-white" style={{ y: bgY }} />
+      <motion.div className="absolute inset-0 bg-gradient-to-b from-[#f8fafc] via-white to-white" style={{ y: bgY }} />
 
       {/* Floating background elements */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 pointer-events-none">
         <motion.div
           className="absolute top-20 left-[10%] w-72 h-72 bg-[#12D6E7]/10 rounded-full blur-3xl"
           animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 30, 0],
+            scale: [1, 1.15, 1],
+            x: [0, 25, 0],
           }}
-          transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+          transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         />
         <motion.div
           className="absolute top-40 right-[5%] w-96 h-96 bg-[#0064D6]/10 rounded-full blur-3xl"
           animate={{
-            scale: [1.2, 1, 1.2],
-            x: [0, -20, 0],
+            scale: [1.15, 1, 1.15],
+            x: [0, -15, 0],
           }}
-          transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+          transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-20 left-[30%] w-64 h-64 bg-[#002E9C]/5 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.1, 1],
+            y: [0, -20, 0],
+          }}
+          transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         />
       </div>
 
@@ -91,10 +101,14 @@ export function HeroSection() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           {/* Left content */}
           <div className="text-center lg:text-left">
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: smoothEasing }}
+            >
               <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#0064D6]/10 rounded-full text-[#0064D6] text-sm font-medium mb-6">
                 <span className="w-2 h-2 bg-[#12D6E7] rounded-full animate-pulse" />
-                India's Trusted Finance Partner
+                {"India's Trusted Finance Partner"}
               </span>
             </motion.div>
 
@@ -102,7 +116,7 @@ export function HeroSection() {
               className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#111111] leading-tight mb-6 text-balance"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: smoothEasing }}
             >
               Smart Loans for a{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0064D6] to-[#12D6E7]">
@@ -114,7 +128,7 @@ export function HeroSection() {
               className="text-lg text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: smoothEasing }}
             >
               Get instant loan approvals with competitive interest rates. Experience hassle-free financing with complete
               transparency.
@@ -124,25 +138,26 @@ export function HeroSection() {
               className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start mb-12"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.8, delay: 0.3, ease: smoothEasing }}
             >
               <Link href="/eligibility">
                 <motion.button
-                  className="group bg-gradient-to-r from-[#0064D6] to-[#002E9C] text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-[#0064D6]/25 flex items-center gap-2"
-                  whileHover={{ scale: 1.02, boxShadow: "0 25px 50px -12px rgba(0, 100, 214, 0.35)" }}
-                  whileTap={{ scale: 0.98 }}
+                  className="group bg-gradient-to-r from-[#0064D6] to-[#002E9C] text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl shadow-[#0064D6]/20 flex items-center gap-2"
+                  whileHover={{ scale: 1.03, boxShadow: "0 25px 50px -12px rgba(0, 100, 214, 0.3)" }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ duration: 0.3, ease: smoothEasing }}
                   onMouseEnter={() => setIsHoveringCTA(true)}
                   onMouseLeave={() => setIsHoveringCTA(false)}
                 >
                   Check Eligibility
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                 </motion.button>
               </Link>
               <Link href="/products">
                 <motion.button
-                  className="px-8 py-4 rounded-full font-semibold text-[#0064D6] border-2 border-[#0064D6]/20 hover:border-[#0064D6]/40 transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  className="px-8 py-4 rounded-full font-semibold text-[#0064D6] border-2 border-[#0064D6]/20 hover:border-[#0064D6]/40 hover:bg-[#0064D6]/5 transition-all duration-300"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                 >
                   View Products
                 </motion.button>
@@ -154,7 +169,7 @@ export function HeroSection() {
               className="flex flex-wrap items-center justify-center lg:justify-start gap-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
             >
               {trustBadges.map((badge, index) => (
                 <motion.div
@@ -162,7 +177,7 @@ export function HeroSection() {
                   className="flex items-center gap-2 text-gray-600"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + index * 0.1 }}
+                  transition={{ delay: 0.6 + index * 0.1, ease: smoothEasing }}
                 >
                   <badge.icon className="w-5 h-5 text-[#008B96]" />
                   <span className="text-sm font-medium">{badge.text}</span>
@@ -171,7 +186,6 @@ export function HeroSection() {
             </motion.div>
           </div>
 
-          {/* Right content - Floating cards */}
           <motion.div
             className="relative h-[500px] lg:h-[600px]"
             style={{
@@ -180,7 +194,7 @@ export function HeroSection() {
               opacity: cardsOpacity,
             }}
           >
-            <div className="relative w-full h-full perspective-1000">
+            <div className="relative w-full h-full" style={{ perspective: "1000px" }}>
               {heroCards.map((card, index) => {
                 const isActive = index === activeCard
                 const offset = (index - activeCard + heroCards.length) % heroCards.length
@@ -188,42 +202,50 @@ export function HeroSection() {
                 return (
                   <motion.div
                     key={card.title}
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-72 sm:w-80"
+                    className="absolute left-1/2 top-1/2 w-72 sm:w-80"
                     initial={false}
                     animate={{
-                      z: isActive ? 100 : 50 - offset * 25,
-                      y: offset * 40,
-                      x: offset * 20,
-                      rotateY: offset * -5,
-                      rotateX: offset * 3,
-                      scale: 1 - offset * 0.08,
-                      opacity: 1 - offset * 0.3,
+                      translateX: "-50%",
+                      translateY: `calc(-50% + ${offset * 35}px)`,
+                      translateZ: isActive ? 100 : 50 - offset * 25,
+                      rotateY: offset * -4,
+                      rotateX: offset * 2,
+                      scale: 1 - offset * 0.07,
+                      opacity: 1 - offset * 0.25,
                     }}
                     transition={{
-                      duration: 0.7,
-                      ease: [0.32, 0.72, 0, 1],
+                      duration: 0.9,
+                      ease: smoothEasing,
                     }}
                     style={{
                       transformStyle: "preserve-3d",
+                      zIndex: heroCards.length - offset,
                     }}
                   >
-                    <div className={`bg-gradient-to-br ${card.color} rounded-3xl p-8 shadow-2xl text-white`}>
-                      {/* Card glow */}
-                      <div className="absolute inset-0 rounded-3xl bg-white/10 blur-xl scale-90 opacity-50" />
+                    {/* Card with solid gradient background */}
+                    <div
+                      className={`relative ${card.gradient} rounded-3xl p-8 shadow-2xl ${card.shadowColor} overflow-hidden`}
+                    >
+                      {/* Subtle inner glow */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/10 pointer-events-none" />
 
-                      <div className="relative">
-                        <div className="text-5xl mb-4">{card.icon}</div>
-                        <h3 className="text-2xl font-bold mb-2">{card.title}</h3>
-                        <p className="text-white/80 mb-6">{card.subtitle}</p>
+                      {/* Card content - all text is white */}
+                      <div className="relative z-10">
+                        <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-5">
+                          <card.Icon className="w-7 h-7 text-white" />
+                        </div>
+
+                        <h3 className="text-2xl font-bold text-white mb-2">{card.title}</h3>
+                        <p className="text-white/90 mb-6 font-medium">{card.subtitle}</p>
 
                         <div className="flex items-end justify-between">
                           <div>
-                            <span className="text-white/60 text-sm">Starting from</span>
-                            <div className="text-3xl font-bold">{card.rate}</div>
-                            <span className="text-white/60 text-sm">p.a.</span>
+                            <span className="text-white/70 text-sm block">Starting from</span>
+                            <div className="text-4xl font-bold text-white">{card.rate}</div>
+                            <span className="text-white/70 text-sm">p.a.</span>
                           </div>
                           <motion.button
-                            className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium hover:bg-white/30 transition-colors"
+                            className="bg-white text-[#0064D6] px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-white/90 transition-colors duration-300 shadow-lg"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
@@ -243,8 +265,8 @@ export function HeroSection() {
                 <button
                   key={index}
                   onClick={() => setActiveCard(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === activeCard ? "w-8 bg-[#0064D6]" : "bg-gray-300 hover:bg-gray-400"
+                  className={`h-2 rounded-full transition-all duration-500 ${
+                    index === activeCard ? "w-8 bg-[#0064D6]" : "w-2 bg-gray-300 hover:bg-gray-400"
                   }`}
                 />
               ))}
@@ -258,17 +280,17 @@ export function HeroSection() {
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
+        transition={{ delay: 1.2, duration: 0.6 }}
       >
         <motion.div
           className="w-6 h-10 border-2 border-[#0064D6]/30 rounded-full flex justify-center pt-2"
           animate={{ y: [0, 5, 0] }}
-          transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+          transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         >
           <motion.div
             className="w-1.5 h-3 bg-[#0064D6] rounded-full"
             animate={{ y: [0, 8, 0], opacity: [1, 0.5, 1] }}
-            transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+            transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
           />
         </motion.div>
       </motion.div>

@@ -34,20 +34,33 @@ export function ParallaxProvider({ children }: { children: React.ReactNode }) {
   const [viewportHeight, setViewportHeight] = useState(0)
   const [isHoveringCTA, setIsHoveringCTA] = useState(false)
   const rafRef = useRef<number>()
+  const targetScrollY = useRef(0)
+  const currentScrollY = useRef(0)
 
   const handleScroll = useCallback(() => {
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current)
     }
 
-    rafRef.current = requestAnimationFrame(() => {
+    const animate = () => {
       const scrollTop = window.scrollY
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight
-      const progress = docHeight > 0 ? scrollTop / docHeight : 0
+      targetScrollY.current = scrollTop
 
-      setScrollY(scrollTop)
+      currentScrollY.current += (targetScrollY.current - currentScrollY.current) * 0.1
+
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight
+      const progress = docHeight > 0 ? currentScrollY.current / docHeight : 0
+
+      setScrollY(currentScrollY.current)
       setScrollProgress(progress)
-    })
+
+      // Continue animation if there's still difference
+      if (Math.abs(targetScrollY.current - currentScrollY.current) > 0.1) {
+        rafRef.current = requestAnimationFrame(animate)
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(animate)
   }, [])
 
   useEffect(() => {
