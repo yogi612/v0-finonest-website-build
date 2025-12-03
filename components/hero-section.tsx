@@ -1,10 +1,21 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { useEffect, useRef, useState, useCallback } from "react"
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { useParallax } from "./parallax-provider"
-import { ArrowRight, Shield, Clock, Percent, CheckCircle2, Home, Briefcase, CreditCard } from "lucide-react"
+import {
+  ArrowRight,
+  Shield,
+  Clock,
+  Percent,
+  CheckCircle2,
+  Home,
+  Briefcase,
+  CreditCard,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 
 const heroCards = [
   {
@@ -33,6 +44,30 @@ const heroCards = [
   },
 ]
 
+const heroSlides = [
+  {
+    badge: "India's Trusted Finance Partner",
+    title: "Smart Loans for a",
+    highlight: "Brighter Future",
+    description:
+      "Get instant loan approvals with competitive interest rates. Experience hassle-free financing with complete transparency.",
+  },
+  {
+    badge: "Quick Approval Process",
+    title: "Your Dreams,",
+    highlight: "Our Priority",
+    description:
+      "From personal loans to home financing, we offer customized solutions that fit your unique financial journey.",
+  },
+  {
+    badge: "Lowest Interest Rates",
+    title: "Finance Made",
+    highlight: "Simple & Fast",
+    description:
+      "Apply online in minutes, get approval in hours. No hidden charges, no lengthy paperwork, just pure simplicity.",
+  },
+]
+
 const trustBadges = [
   { icon: Shield, text: "RBI Registered" },
   { icon: Clock, text: "24hr Approval" },
@@ -46,6 +81,7 @@ export function HeroSection() {
   const { setIsHoveringCTA } = useParallax()
   const sectionRef = useRef<HTMLDivElement>(null)
   const [activeCard, setActiveCard] = useState(0)
+  const [activeSlide, setActiveSlide] = useState(0)
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -57,10 +93,25 @@ export function HeroSection() {
   const cardsOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
   const bgY = useTransform(scrollYProgress, [0, 1], [0, 80])
 
+  const nextSlide = useCallback(() => {
+    setActiveSlide((prev) => (prev + 1) % heroSlides.length)
+  }, [])
+
+  const prevSlide = useCallback(() => {
+    setActiveSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)
+  }, [])
+
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveCard((prev) => (prev + 1) % heroCards.length)
     }, 4000)
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % heroSlides.length)
+    }, 6000)
     return () => clearInterval(interval)
   }, [])
 
@@ -99,40 +150,74 @@ export function HeroSection() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-24">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          {/* Left content */}
-          <div className="text-center lg:text-left">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: smoothEasing }}
-            >
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#0064D6]/10 rounded-full text-[#0064D6] text-sm font-medium mb-6">
-                <span className="w-2 h-2 bg-[#12D6E7] rounded-full animate-pulse" />
-                {"India's Trusted Finance Partner"}
-              </span>
-            </motion.div>
+          <div className="text-center lg:text-left relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSlide}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.5, ease: smoothEasing }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: smoothEasing }}
+                >
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#0064D6]/10 rounded-full text-[#0064D6] text-sm font-medium mb-6">
+                    <span className="w-2 h-2 bg-[#12D6E7] rounded-full animate-pulse" />
+                    {heroSlides[activeSlide].badge}
+                  </span>
+                </motion.div>
 
-            <motion.h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#111111] leading-tight mb-6 text-balance"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: smoothEasing }}
-            >
-              Smart Loans for a{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0064D6] to-[#12D6E7]">
-                Brighter Future
-              </span>
-            </motion.h1>
+                <motion.h1
+                  className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#111111] leading-tight mb-6 text-balance"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.1, ease: smoothEasing }}
+                >
+                  {heroSlides[activeSlide].title}{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0064D6] to-[#12D6E7]">
+                    {heroSlides[activeSlide].highlight}
+                  </span>
+                </motion.h1>
 
-            <motion.p
-              className="text-lg text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, ease: smoothEasing }}
-            >
-              Get instant loan approvals with competitive interest rates. Experience hassle-free financing with complete
-              transparency.
-            </motion.p>
+                <motion.p
+                  className="text-lg text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: smoothEasing }}
+                >
+                  {heroSlides[activeSlide].description}
+                </motion.p>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="flex items-center gap-3 mb-8 justify-center lg:justify-start">
+              <button
+                onClick={prevSlide}
+                className="w-10 h-10 rounded-full border-2 border-[#0064D6]/20 flex items-center justify-center text-[#0064D6] hover:bg-[#0064D6]/10 transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex gap-2">
+                {heroSlides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveSlide(index)}
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      index === activeSlide ? "w-8 bg-[#0064D6]" : "w-2 bg-gray-300 hover:bg-gray-400"
+                    }`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={nextSlide}
+                className="w-10 h-10 rounded-full border-2 border-[#0064D6]/20 flex items-center justify-center text-[#0064D6] hover:bg-[#0064D6]/10 transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
 
             <motion.div
               className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start mb-12"
@@ -186,6 +271,7 @@ export function HeroSection() {
             </motion.div>
           </div>
 
+          {/* Right side - 3D Card Stack */}
           <motion.div
             className="relative h-[500px] lg:h-[600px]"
             style={{
@@ -222,14 +308,11 @@ export function HeroSection() {
                       zIndex: heroCards.length - offset,
                     }}
                   >
-                    {/* Card with solid gradient background */}
                     <div
                       className={`relative ${card.gradient} rounded-3xl p-8 shadow-2xl ${card.shadowColor} overflow-hidden`}
                     >
-                      {/* Subtle inner glow */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/10 pointer-events-none" />
 
-                      {/* Card content - all text is white */}
                       <div className="relative z-10">
                         <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-5">
                           <card.Icon className="w-7 h-7 text-white" />

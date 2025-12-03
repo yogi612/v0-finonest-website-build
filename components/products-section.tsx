@@ -1,10 +1,20 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Link from "next/link"
 import { ParallaxCard } from "./parallax-card"
-import { ArrowRight, Home, User, Briefcase, CreditCard, Car, GraduationCap } from "lucide-react"
+import {
+  ArrowRight,
+  Home,
+  User,
+  Briefcase,
+  CreditCard,
+  Car,
+  GraduationCap,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 import { useParallax } from "./parallax-provider"
 
 const products = [
@@ -73,6 +83,9 @@ const products = [
 export function ProductsSection() {
   const { setIsHoveringCTA } = useParallax()
   const sectionRef = useRef<HTMLDivElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(true)
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -82,6 +95,33 @@ export function ProductsSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
   const y = useTransform(scrollYProgress, [0, 0.2], [100, 0])
 
+  const checkScrollButtons = () => {
+    if (carouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current
+      setCanScrollLeft(scrollLeft > 0)
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
+    }
+  }
+
+  useEffect(() => {
+    checkScrollButtons()
+    const carousel = carouselRef.current
+    if (carousel) {
+      carousel.addEventListener("scroll", checkScrollButtons)
+      return () => carousel.removeEventListener("scroll", checkScrollButtons)
+    }
+  }, [])
+
+  const scroll = (direction: "left" | "right") => {
+    if (carouselRef.current) {
+      const scrollAmount = 360
+      carouselRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      })
+    }
+  }
+
   return (
     <section ref={sectionRef} className="relative py-24 overflow-hidden">
       {/* Background gradient */}
@@ -89,91 +129,134 @@ export function ProductsSection() {
 
       <motion.div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style={{ opacity, y }}>
         {/* Section header */}
-        <div className="text-center mb-16">
-          <motion.span
-            className="inline-block px-4 py-2 bg-[#12D6E7]/10 rounded-full text-[#008B96] text-sm font-medium mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            Our Products
-          </motion.span>
-          <motion.h2
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111111] mb-4 text-balance"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-          >
-            Financial Solutions{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0064D6] to-[#12D6E7]">
-              For Everyone
-            </span>
-          </motion.h2>
-          <motion.p
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-          >
-            Choose from our wide range of financial products designed to meet your unique needs.
-          </motion.p>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-12">
+          <div className="text-center sm:text-left mb-6 sm:mb-0">
+            <motion.span
+              className="inline-block px-4 py-2 bg-[#12D6E7]/10 rounded-full text-[#008B96] text-sm font-medium mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              Our Products
+            </motion.span>
+            <motion.h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111111] mb-4 text-balance"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+            >
+              Financial Solutions{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0064D6] to-[#12D6E7]">
+                For Everyone
+              </span>
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-600 max-w-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              Choose from our wide range of financial products designed to meet your unique needs.
+            </motion.p>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-3">
+            <motion.button
+              onClick={() => scroll("left")}
+              disabled={!canScrollLeft}
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                canScrollLeft
+                  ? "border-[#0064D6] text-[#0064D6] hover:bg-[#0064D6] hover:text-white"
+                  : "border-gray-200 text-gray-300 cursor-not-allowed"
+              }`}
+              whileHover={canScrollLeft ? { scale: 1.05 } : {}}
+              whileTap={canScrollLeft ? { scale: 0.95 } : {}}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </motion.button>
+            <motion.button
+              onClick={() => scroll("right")}
+              disabled={!canScrollRight}
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                canScrollRight
+                  ? "border-[#0064D6] text-[#0064D6] hover:bg-[#0064D6] hover:text-white"
+                  : "border-gray-200 text-gray-300 cursor-not-allowed"
+              }`}
+              whileHover={canScrollRight ? { scale: 1.05 } : {}}
+              whileTap={canScrollRight ? { scale: 0.95 } : {}}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </motion.button>
+          </div>
         </div>
 
-        {/* Products grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div
+          ref={carouselRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide pb-6 snap-x snap-mandatory scroll-smooth -mx-4 px-4"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           {products.map((product, index) => (
-            <ParallaxCard key={product.title} index={index} glowColor={product.color}>
-              <div className="relative">
-                {/* Icon */}
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: `${product.color}15` }}
-                >
-                  <product.icon className="w-7 h-7" style={{ color: product.color }} />
-                </div>
-
-                {/* Content */}
-                <h3 className="text-xl font-bold text-[#111111] mb-2">{product.title}</h3>
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed">{product.description}</p>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-2 mb-4 p-3 bg-[#f4f7fa] rounded-xl">
-                  <div className="text-center">
-                    <div className="text-lg font-bold" style={{ color: product.color }}>
-                      {product.rate}
-                    </div>
-                    <div className="text-xs text-gray-500">Interest</div>
-                  </div>
-                  <div className="text-center border-x border-gray-200">
-                    <div className="text-lg font-bold text-[#111111]">{product.maxAmount}</div>
-                    <div className="text-xs text-gray-500">Max Amount</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-[#111111]">{product.tenure}</div>
-                    <div className="text-xs text-gray-500">Tenure</div>
-                  </div>
-                </div>
-
-                {/* CTA */}
-                <Link href={product.href}>
-                  <motion.button
-                    className="w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors"
-                    style={{
-                      backgroundColor: `${product.color}10`,
-                      color: product.color,
-                    }}
-                    whileHover={{ backgroundColor: `${product.color}20` }}
-                    onMouseEnter={() => setIsHoveringCTA(true)}
-                    onMouseLeave={() => setIsHoveringCTA(false)}
+            <motion.div
+              key={product.title}
+              className="flex-shrink-0 w-[300px] sm:w-[340px] snap-start"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <ParallaxCard index={index} glowColor={product.color}>
+                <div className="relative">
+                  {/* Icon */}
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
+                    style={{ backgroundColor: `${product.color}15` }}
                   >
-                    Apply Now
-                    <ArrowRight className="w-4 h-4" />
-                  </motion.button>
-                </Link>
-              </div>
-            </ParallaxCard>
+                    <product.icon className="w-7 h-7" style={{ color: product.color }} />
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-xl font-bold text-[#111111] mb-2">{product.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">{product.description}</p>
+
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-2 mb-4 p-3 bg-[#f4f7fa] rounded-xl">
+                    <div className="text-center">
+                      <div className="text-lg font-bold" style={{ color: product.color }}>
+                        {product.rate}
+                      </div>
+                      <div className="text-xs text-gray-500">Interest</div>
+                    </div>
+                    <div className="text-center border-x border-gray-200">
+                      <div className="text-lg font-bold text-[#111111]">{product.maxAmount}</div>
+                      <div className="text-xs text-gray-500">Max Amount</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-bold text-[#111111]">{product.tenure}</div>
+                      <div className="text-xs text-gray-500">Tenure</div>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <Link href={product.href}>
+                    <motion.button
+                      className="w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-colors"
+                      style={{
+                        backgroundColor: `${product.color}10`,
+                        color: product.color,
+                      }}
+                      whileHover={{ backgroundColor: `${product.color}20` }}
+                      onMouseEnter={() => setIsHoveringCTA(true)}
+                      onMouseLeave={() => setIsHoveringCTA(false)}
+                    >
+                      Apply Now
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.button>
+                  </Link>
+                </div>
+              </ParallaxCard>
+            </motion.div>
           ))}
         </div>
 
