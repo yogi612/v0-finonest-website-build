@@ -7,6 +7,7 @@ import { VideoSection } from "@/components/video-section"
 import { CTASection } from "@/components/cta-section"
 import { FloatingShapes } from "@/components/floating-shapes"
 import { OffersCarousel } from "@/components/offers-carousel"
+import { ProductsBanner } from "@/components/products-banner"
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <FloatingShapes />
       <HeroSection />
       <OffersCarousel />
+      <ProductsBanner />
       <ProductsSection />
       <VideoSection />
       <StatsSection />

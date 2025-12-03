@@ -15,6 +15,8 @@ import {
   CreditCard,
   ChevronLeft,
   ChevronRight,
+  BadgePercent,
+  Sparkles,
 } from "lucide-react"
 
 const heroCards = [
@@ -75,6 +77,45 @@ const trustBadges = [
   { icon: CheckCircle2, text: "No Hidden Fees" },
 ]
 
+const heroBanners = [
+  {
+    id: 1,
+    title: "Festive Season Sale",
+    subtitle: "Get up to 50% off on processing fees",
+    cta: "Grab Offer",
+    image: "/festive-celebration-finance-gold-coins.jpg",
+    gradient: "from-[#0064D6] via-[#002E9C] to-[#0064D6]",
+    badge: "Limited Time",
+  },
+  {
+    id: 2,
+    title: "Home Loan Special",
+    subtitle: "Interest rates starting at just 8.25% p.a.",
+    cta: "Apply Now",
+    image: "/modern-dream-home-sunset.jpg",
+    gradient: "from-[#12D6E7] via-[#008B96] to-[#12D6E7]",
+    badge: "Best Seller",
+  },
+  {
+    id: 3,
+    title: "Instant Personal Loan",
+    subtitle: "Get approved in 15 minutes, disbursed in 24 hours",
+    cta: "Check Eligibility",
+    image: "/happy-person-receiving-money-transfer-phone.jpg",
+    gradient: "from-[#008B96] via-[#002E9C] to-[#008B96]",
+    badge: "Quick Approval",
+  },
+  {
+    id: 4,
+    title: "Business Growth Loan",
+    subtitle: "Fuel your dreams with loans up to Rs.50 Lakhs",
+    cta: "Get Started",
+    image: "/business-growth-chart-office-success.jpg",
+    gradient: "from-[#002E9C] via-[#0064D6] to-[#002E9C]",
+    badge: "For Entrepreneurs",
+  },
+]
+
 const smoothEasing = [0.16, 1, 0.3, 1]
 
 export function HeroSection() {
@@ -82,6 +123,7 @@ export function HeroSection() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const [activeCard, setActiveCard] = useState(0)
   const [activeSlide, setActiveSlide] = useState(0)
+  const [activeBanner, setActiveBanner] = useState(0)
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -101,6 +143,14 @@ export function HeroSection() {
     setActiveSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)
   }, [])
 
+  const nextBanner = useCallback(() => {
+    setActiveBanner((prev) => (prev + 1) % heroBanners.length)
+  }, [])
+
+  const prevBanner = useCallback(() => {
+    setActiveBanner((prev) => (prev - 1 + heroBanners.length) % heroBanners.length)
+  }, [])
+
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveCard((prev) => (prev + 1) % heroCards.length)
@@ -110,8 +160,8 @@ export function HeroSection() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % heroSlides.length)
-    }, 6000)
+      setActiveBanner((prev) => (prev + 1) % heroBanners.length)
+    }, 5000)
     return () => clearInterval(interval)
   }, [])
 
@@ -148,7 +198,126 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-24">
+      {/* Hero Banner Carousel at the top */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mb-12">
+        <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeBanner}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.6, ease: smoothEasing }}
+              className={`relative h-[280px] sm:h-[350px] lg:h-[400px] bg-gradient-to-r ${heroBanners[activeBanner].gradient}`}
+            >
+              {/* Background image with overlay */}
+              <div className="absolute inset-0">
+                <img
+                  src={heroBanners[activeBanner].image || "/placeholder.svg"}
+                  alt={heroBanners[activeBanner].title}
+                  className="w-full h-full object-cover opacity-30"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/30" />
+              </div>
+
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+
+              {/* Floating icons */}
+              <motion.div
+                className="absolute top-10 right-20 hidden lg:block"
+                animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
+                transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+              >
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                  <BadgePercent className="w-8 h-8 text-white" />
+                </div>
+              </motion.div>
+              <motion.div
+                className="absolute bottom-16 right-40 hidden lg:block"
+                animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }}
+                transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
+              >
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+              </motion.div>
+
+              {/* Content */}
+              <div className="relative z-10 h-full flex flex-col justify-center px-8 sm:px-12 lg:px-16">
+                <motion.span
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4 w-fit"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  {heroBanners[activeBanner].badge}
+                </motion.span>
+                <motion.h2
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 max-w-lg"
+                >
+                  {heroBanners[activeBanner].title}
+                </motion.h2>
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-lg sm:text-xl text-white/90 mb-6 max-w-md"
+                >
+                  {heroBanners[activeBanner].subtitle}
+                </motion.p>
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                  <Link href="/eligibility">
+                    <motion.button
+                      className="group bg-white text-[#0064D6] px-8 py-3.5 rounded-full font-bold text-lg shadow-xl flex items-center gap-2"
+                      whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {heroBanners[activeBanner].cta}
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </motion.button>
+                  </Link>
+                </motion.div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Banner navigation */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
+            <button
+              onClick={prevBanner}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <div className="flex gap-2">
+              {heroBanners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveBanner(index)}
+                  className={`h-2 rounded-full transition-all duration-500 ${
+                    index === activeBanner ? "w-8 bg-white" : "w-2 bg-white/50 hover:bg-white/70"
+                  }`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={nextBanner}
+              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-12">
+        {/* Grid content */}
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           <div className="text-center lg:text-left relative">
             <AnimatePresence mode="wait">
