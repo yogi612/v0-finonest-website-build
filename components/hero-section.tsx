@@ -3,28 +3,16 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import Link from "next/link"
+import Image from "next/image"
 import { useParallax } from "./parallax-provider"
-import {
-  ArrowRight,
-  Shield,
-  Clock,
-  Percent,
-  CheckCircle2,
-  Home,
-  Briefcase,
-  CreditCard,
-  ChevronLeft,
-  ChevronRight,
-  BadgePercent,
-  Sparkles,
-} from "lucide-react"
+import { ArrowRight, Shield, Clock, Percent, CheckCircle2, ChevronLeft, ChevronRight, Play } from "lucide-react"
 
 const heroCards = [
   {
     title: "Personal Loans",
     subtitle: "Up to ₹25 Lakhs",
     rate: "10.5%",
-    Icon: CreditCard,
+    Icon: ArrowRight,
     gradient: "bg-gradient-to-br from-[#0064D6] to-[#002E9C]",
     shadowColor: "shadow-[#0064D6]/30",
   },
@@ -32,7 +20,7 @@ const heroCards = [
     title: "Home Loans",
     subtitle: "Dream Home Awaits",
     rate: "8.5%",
-    Icon: Home,
+    Icon: ArrowRight,
     gradient: "bg-gradient-to-br from-[#12D6E7] to-[#008B96]",
     shadowColor: "shadow-[#12D6E7]/30",
   },
@@ -40,7 +28,7 @@ const heroCards = [
     title: "Business Loans",
     subtitle: "Grow Your Business",
     rate: "12%",
-    Icon: Briefcase,
+    Icon: ArrowRight,
     gradient: "bg-gradient-to-br from-[#008B96] to-[#002E9C]",
     shadowColor: "shadow-[#008B96]/30",
   },
@@ -80,39 +68,43 @@ const trustBadges = [
 const heroBanners = [
   {
     id: 1,
-    title: "Festive Season Sale",
-    subtitle: "Get up to 50% off on processing fees",
+    badge: "Festive Season Sale",
+    title: "Get up to 50% off",
+    highlight: "Processing Fees",
+    description: "Limited time offer on all loan products. Apply now and save big!",
     cta: "Grab Offer",
     image: "/festive-celebration-finance-gold-coins.jpg",
-    gradient: "from-[#0064D6] via-[#002E9C] to-[#0064D6]",
-    badge: "Limited Time",
+    gradient: "from-[#0064D6] to-[#002E9C]",
   },
   {
     id: 2,
-    title: "Home Loan Special",
-    subtitle: "Interest rates starting at just 8.25% p.a.",
+    badge: "Home Loan Special",
+    title: "Dream Home Awaits",
+    highlight: "8.25% p.a.",
+    description: "Lowest interest rates starting at just 8.25% p.a. for home loans.",
     cta: "Apply Now",
     image: "/modern-dream-home-sunset.jpg",
-    gradient: "from-[#12D6E7] via-[#008B96] to-[#12D6E7]",
-    badge: "Best Seller",
+    gradient: "from-[#12D6E7] to-[#008B96]",
   },
   {
     id: 3,
-    title: "Instant Personal Loan",
-    subtitle: "Get approved in 15 minutes, disbursed in 24 hours",
+    badge: "Instant Approval",
+    title: "Personal Loan in",
+    highlight: "15 Minutes",
+    description: "Get approved in 15 minutes, disbursed in 24 hours. No hassle!",
     cta: "Check Eligibility",
     image: "/happy-person-receiving-money-transfer-phone.jpg",
-    gradient: "from-[#008B96] via-[#002E9C] to-[#008B96]",
-    badge: "Quick Approval",
+    gradient: "from-[#008B96] to-[#002E9C]",
   },
   {
     id: 4,
-    title: "Business Growth Loan",
-    subtitle: "Fuel your dreams with loans up to Rs.50 Lakhs",
+    badge: "For Entrepreneurs",
+    title: "Business Growth",
+    highlight: "Up to Rs.50 Lakhs",
+    description: "Fuel your business dreams with our flexible financing options.",
     cta: "Get Started",
     image: "/business-growth-chart-office-success.jpg",
-    gradient: "from-[#002E9C] via-[#0064D6] to-[#002E9C]",
-    badge: "For Entrepreneurs",
+    gradient: "from-[#002E9C] to-[#0064D6]",
   },
 ]
 
@@ -124,6 +116,7 @@ export function HeroSection() {
   const [activeCard, setActiveCard] = useState(0)
   const [activeSlide, setActiveSlide] = useState(0)
   const [activeBanner, setActiveBanner] = useState(0)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -159,139 +152,142 @@ export function HeroSection() {
   }, [])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveBanner((prev) => (prev + 1) % heroBanners.length)
-    }, 5000)
+    if (!isAutoPlaying) return
+    const interval = setInterval(nextBanner, 6000)
     return () => clearInterval(interval)
-  }, [])
+  }, [isAutoPlaying, nextBanner])
 
   return (
-    <section ref={sectionRef} className="relative min-h-[100vh] overflow-hidden pt-20">
+    <section ref={sectionRef} className="relative min-h-[90vh] overflow-hidden pt-20 bg-white">
       {/* Animated background */}
       <motion.div className="absolute inset-0 bg-gradient-to-b from-[#f8fafc] via-white to-white" style={{ y: bgY }} />
 
       {/* Floating background elements */}
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
-          className="absolute top-20 left-[10%] w-72 h-72 bg-[#12D6E7]/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.15, 1],
-            x: [0, 25, 0],
-          }}
+          className="absolute top-20 left-[10%] w-72 h-72 bg-[#12D6E7]/8 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.15, 1], x: [0, 25, 0] }}
           transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute top-40 right-[5%] w-96 h-96 bg-[#0064D6]/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1.15, 1, 1.15],
-            x: [0, -15, 0],
-          }}
+          className="absolute top-40 right-[5%] w-96 h-96 bg-[#0064D6]/8 rounded-full blur-3xl"
+          animate={{ scale: [1.15, 1, 1.15], x: [0, -15, 0] }}
           transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-20 left-[30%] w-64 h-64 bg-[#002E9C]/5 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.1, 1],
-            y: [0, -20, 0],
-          }}
-          transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         />
       </div>
 
       {/* Hero Banner Carousel at the top */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mb-12">
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mb-16">
+        <div
+          className="relative rounded-3xl overflow-hidden shadow-2xl"
+          onMouseEnter={() => setIsAutoPlaying(false)}
+          onMouseLeave={() => setIsAutoPlaying(true)}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={activeBanner}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.6, ease: smoothEasing }}
-              className={`relative h-[280px] sm:h-[350px] lg:h-[400px] bg-gradient-to-r ${heroBanners[activeBanner].gradient}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: smoothEasing }}
+              className={`relative h-[450px] sm:h-[500px] lg:h-[550px] bg-gradient-to-br ${heroBanners[activeBanner].gradient}`}
             >
-              {/* Background image with overlay */}
+              {/* Background image */}
               <div className="absolute inset-0">
-                <img
+                <Image
                   src={heroBanners[activeBanner].image || "/placeholder.svg"}
                   alt={heroBanners[activeBanner].title}
-                  className="w-full h-full object-cover opacity-30"
+                  fill
+                  className="object-cover opacity-20"
+                  priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
               </div>
 
               {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-
-              {/* Floating icons */}
-              <motion.div
-                className="absolute top-10 right-20 hidden lg:block"
-                animate={{ y: [0, -10, 0], rotate: [0, 5, 0] }}
-                transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-              >
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                  <BadgePercent className="w-8 h-8 text-white" />
-                </div>
-              </motion.div>
-              <motion.div
-                className="absolute bottom-16 right-40 hidden lg:block"
-                animate={{ y: [0, 10, 0], rotate: [0, -5, 0] }}
-                transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
-              >
-                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-              </motion.div>
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+              <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-white/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/3" />
 
               {/* Content */}
-              <div className="relative z-10 h-full flex flex-col justify-center px-8 sm:px-12 lg:px-16">
+              <div className="relative z-10 h-full flex flex-col justify-center px-8 sm:px-12 lg:px-20 max-w-3xl">
                 <motion.span
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium mb-4 w-fit"
+                  transition={{ delay: 0.1, duration: 0.5 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md rounded-full text-white text-sm font-semibold mb-6 w-fit border border-white/20"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <span className="w-2 h-2 bg-[#12D6E7] rounded-full animate-pulse" />
                   {heroBanners[activeBanner].badge}
                 </motion.span>
-                <motion.h2
-                  initial={{ opacity: 0, y: 20 }}
+
+                <motion.h1
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 max-w-lg"
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4"
                 >
-                  {heroBanners[activeBanner].title}
-                </motion.h2>
+                  {heroBanners[activeBanner].title}{" "}
+                  <span className="text-[#12D6E7]">{heroBanners[activeBanner].highlight}</span>
+                </motion.h1>
+
                 <motion.p
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-lg sm:text-xl text-white/90 mb-6 max-w-md"
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className="text-lg sm:text-xl text-white/85 mb-8 max-w-xl leading-relaxed"
                 >
-                  {heroBanners[activeBanner].subtitle}
+                  {heroBanners[activeBanner].description}
                 </motion.p>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                  className="flex flex-wrap gap-4"
+                >
                   <Link href="/eligibility">
                     <motion.button
-                      className="group bg-white text-[#0064D6] px-8 py-3.5 rounded-full font-bold text-lg shadow-xl flex items-center gap-2"
-                      whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(0,0,0,0.2)" }}
-                      whileTap={{ scale: 0.95 }}
+                      className="group bg-white text-[#0064D6] px-8 py-4 rounded-full font-bold text-lg shadow-2xl flex items-center gap-3"
+                      whileHover={{ scale: 1.03, boxShadow: "0 25px 60px rgba(0,0,0,0.3)" }}
+                      whileTap={{ scale: 0.97 }}
+                      onMouseEnter={() => setIsHoveringCTA(true)}
+                      onMouseLeave={() => setIsHoveringCTA(false)}
                     >
                       {heroBanners[activeBanner].cta}
                       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </motion.button>
                   </Link>
+                  <motion.button
+                    className="flex items-center gap-3 px-6 py-4 rounded-full font-semibold text-white border-2 border-white/30 hover:bg-white/10 transition-colors"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                      <Play className="w-4 h-4 fill-white" />
+                    </div>
+                    Watch Video
+                  </motion.button>
                 </motion.div>
+              </div>
+
+              {/* Slide indicator bar */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+                <motion.div
+                  className="h-full bg-[#12D6E7]"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 6, ease: "linear" }}
+                  key={activeBanner}
+                />
               </div>
             </motion.div>
           </AnimatePresence>
 
-          {/* Banner navigation */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">
+          {/* Navigation controls */}
+          <div className="absolute bottom-8 right-8 flex items-center gap-3 z-20">
             <button
               onClick={prevBanner}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+              className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/20 transition-colors border border-white/20"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -300,15 +296,15 @@ export function HeroSection() {
                 <button
                   key={index}
                   onClick={() => setActiveBanner(index)}
-                  className={`h-2 rounded-full transition-all duration-500 ${
-                    index === activeBanner ? "w-8 bg-white" : "w-2 bg-white/50 hover:bg-white/70"
+                  className={`h-2.5 rounded-full transition-all duration-500 ${
+                    index === activeBanner ? "w-10 bg-white" : "w-2.5 bg-white/40 hover:bg-white/60"
                   }`}
                 />
               ))}
             </div>
             <button
               onClick={nextBanner}
-              className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+              className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-white/20 transition-colors border border-white/20"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -331,7 +327,7 @@ export function HeroSection() {
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, ease: smoothEasing }}
+                  transition={{ duration: 0.8, delay: 0.1, ease: smoothEasing }}
                 >
                   <span className="inline-flex items-center gap-2 px-4 py-2 bg-[#0064D6]/10 rounded-full text-[#0064D6] text-sm font-medium mb-6">
                     <span className="w-2 h-2 bg-[#12D6E7] rounded-full animate-pulse" />
@@ -343,7 +339,7 @@ export function HeroSection() {
                   className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#111111] leading-tight mb-6 text-balance"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.1, ease: smoothEasing }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: smoothEasing }}
                 >
                   {heroSlides[activeSlide].title}{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0064D6] to-[#12D6E7]">
@@ -355,7 +351,7 @@ export function HeroSection() {
                   className="text-lg text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed"
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: smoothEasing }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: smoothEasing }}
                 >
                   {heroSlides[activeSlide].description}
                 </motion.p>
@@ -420,21 +416,23 @@ export function HeroSection() {
 
             {/* Trust badges */}
             <motion.div
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-8 lg:gap-16"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
             >
               {trustBadges.map((badge, index) => (
                 <motion.div
                   key={badge.text}
-                  className="flex items-center gap-2 text-gray-600"
+                  className="flex items-center gap-3 text-[#111111]"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + index * 0.1, ease: smoothEasing }}
                 >
-                  <badge.icon className="w-5 h-5 text-[#008B96]" />
-                  <span className="text-sm font-medium">{badge.text}</span>
+                  <div className="w-12 h-12 rounded-xl bg-[#0064D6]/10 flex items-center justify-center">
+                    <badge.icon className="w-6 h-6 text-[#0064D6]" />
+                  </div>
+                  <span className="font-semibold">{badge.text}</span>
                 </motion.div>
               ))}
             </motion.div>
