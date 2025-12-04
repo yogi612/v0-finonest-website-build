@@ -1,18 +1,28 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, ChevronRight } from "lucide-react"
+import { Menu, X, ChevronDown, ChevronRight, Phone, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/products", label: "Products" },
-  { href: "/eligibility", label: "Eligibility" },
+  {
+    href: "/products",
+    label: "Products",
+    submenu: [
+      { href: "/products#personal-loan", label: "Personal Loan" },
+      { href: "/products#home-loan", label: "Home Loan" },
+      { href: "/products#business-loan", label: "Business Loan" },
+      { href: "/products#credit-cards", label: "Credit Cards" },
+    ],
+  },
+  { href: "/eligibility", label: "Check Eligibility" },
   { href: "/blog", label: "Blog" },
-  { href: "/about", label: "About" },
+  { href: "/about", label: "About Us" },
   { href: "/contact", label: "Contact" },
 ]
 
@@ -20,6 +30,7 @@ export function Navigation() {
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,11 +42,38 @@ export function Navigation() {
 
   return (
     <>
+      <div className="hidden lg:block bg-gradient-to-r from-[#002E9C] to-[#0064D6] text-white py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between text-sm">
+          <div className="flex items-center gap-6">
+            <a href="tel:1800-123-4567" className="flex items-center gap-2 hover:text-[#12D6E7] transition-colors">
+              <Phone className="w-4 h-4" />
+              <span>1800-123-4567 (Toll Free)</span>
+            </a>
+            <a
+              href="mailto:support@finonest.com"
+              className="flex items-center gap-2 hover:text-[#12D6E7] transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+              <span>support@finonest.com</span>
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href="/eligibility" className="hover:text-[#12D6E7] transition-colors">
+              Check Eligibility
+            </Link>
+            <span className="w-px h-4 bg-white/30" />
+            <Link href="/contact" className="hover:text-[#12D6E7] transition-colors">
+              Apply Now
+            </Link>
+          </div>
+        </div>
+      </div>
+
       <motion.header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50",
+          "sticky top-0 left-0 right-0 z-50",
           "transition-all duration-500 ease-out",
-          isScrolled ? "bg-white/95 backdrop-blur-xl shadow-lg shadow-black/[0.03]" : "bg-transparent",
+          isScrolled ? "bg-white shadow-lg shadow-black/[0.05]" : "bg-white/95 backdrop-blur-xl",
         )}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -43,46 +81,83 @@ export function Navigation() {
       >
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
               <motion.div
-                className="relative w-10 h-10"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0064D6] to-[#002E9C] rounded-xl rotate-6 group-hover:rotate-12 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#12D6E7] to-[#008B96] rounded-xl -rotate-6 group-hover:-rotate-12 transition-transform duration-500 opacity-70" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">F</span>
-                </div>
+                <Image src="/logo.png" alt="Finonest" width={50} height={50} className="object-contain" priority />
               </motion.div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-[#002E9C]">Finonest</span>
-                <span className="text-[10px] text-[#0064D6] font-medium -mt-1 tracking-wider">SMART FINANCE</span>
+                <span className="text-xl font-bold bg-gradient-to-r from-[#0064D6] to-[#002E9C] bg-clip-text text-transparent">
+                  Finonest
+                </span>
+                <span className="text-[10px] text-[#008B96] font-medium -mt-0.5 tracking-wider">SMART FINANCE</span>
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Navigation with dropdown */}
             <div className="hidden lg:flex items-center gap-1">
               {navItems.map((item) => (
-                <Link
+                <div
                   key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "relative px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300",
-                    pathname === item.href ? "text-[#0064D6]" : "text-gray-600 hover:text-[#0064D6]",
-                  )}
+                  className="relative"
+                  onMouseEnter={() => item.submenu && setActiveSubmenu(item.label)}
+                  onMouseLeave={() => setActiveSubmenu(null)}
                 >
-                  {pathname === item.href && (
-                    <motion.div
-                      layoutId="nav-pill"
-                      className="absolute inset-0 bg-[#0064D6]/10 rounded-full"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                    />
-                  )}
-                  <span className="relative z-10">{item.label}</span>
-                </Link>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex items-center gap-1",
+                      pathname === item.href
+                        ? "text-[#0064D6]"
+                        : "text-gray-700 hover:text-[#0064D6] hover:bg-[#0064D6]/5",
+                    )}
+                  >
+                    {pathname === item.href && (
+                      <motion.div
+                        layoutId="nav-indicator"
+                        className="absolute bottom-0 left-4 right-4 h-0.5 bg-gradient-to-r from-[#12D6E7] to-[#0064D6] rounded-full"
+                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{item.label}</span>
+                    {item.submenu && (
+                      <ChevronDown
+                        className={cn(
+                          "w-4 h-4 transition-transform duration-300",
+                          activeSubmenu === item.label && "rotate-180",
+                        )}
+                      />
+                    )}
+                  </Link>
+
+                  {/* Dropdown menu */}
+                  <AnimatePresence>
+                    {item.submenu && activeSubmenu === item.label && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl shadow-black/10 border border-gray-100 overflow-hidden"
+                      >
+                        <div className="py-2">
+                          {item.submenu.map((subItem) => (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-[#0064D6]/5 hover:to-transparent hover:text-[#0064D6] transition-all duration-200"
+                            >
+                              {subItem.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ))}
             </div>
 
@@ -90,12 +165,12 @@ export function Navigation() {
             <div className="hidden lg:block">
               <Link href="/contact">
                 <motion.button
-                  className="bg-gradient-to-r from-[#0064D6] to-[#002E9C] text-white px-6 py-2.5 rounded-full font-semibold text-sm shadow-lg shadow-[#0064D6]/20"
-                  whileHover={{ scale: 1.03, boxShadow: "0 20px 40px -10px rgba(0, 100, 214, 0.3)" }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                  className="bg-gradient-to-r from-[#0064D6] to-[#002E9C] text-white px-6 py-2.5 rounded-lg font-semibold text-sm shadow-lg shadow-[#0064D6]/25 hover:shadow-xl hover:shadow-[#0064D6]/30 transition-shadow"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  Get Started
+                  Apply Now
                 </motion.button>
               </Link>
             </div>
@@ -158,7 +233,7 @@ export function Navigation() {
                 >
                   <Link href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
                     <button className="w-full bg-gradient-to-r from-[#0064D6] to-[#002E9C] text-white px-6 py-3 rounded-xl font-semibold shadow-lg">
-                      Get Started
+                      Apply Now
                     </button>
                   </Link>
                 </motion.div>

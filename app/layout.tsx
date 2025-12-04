@@ -7,6 +7,7 @@ import { ParallaxProvider } from "@/components/parallax-provider"
 import { Avatar3D } from "@/components/avatar-3d"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
+import { LoadingScreen } from "@/components/loading-screen"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-white`}>
+        <LoadingScreen />
         <ParallaxProvider>
           <Navigation />
           <main className="relative min-h-screen">{children}</main>
